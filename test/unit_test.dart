@@ -1,106 +1,113 @@
 library unittests;
 
-import 'package:unittest/unittest.dart';
 import 'package:options_file/options_file.dart';
 
 import 'dart:io';
 
+import 'package:test/test.dart';
+
 class FileIOExceptionMatcher extends Matcher {
   const FileIOExceptionMatcher();
-  Description describe(Description description) => description.add("FileIOException");
-  bool matches(item, Map matchState) => item is FileSystemException;  
+  Description describe(Description description) =>
+      description.add("FileIOException");
+  bool matches(item, Map matchState) => item is FileSystemException;
 }
 
 class FormatExceptionMatcher extends Matcher {
   const FormatExceptionMatcher();
-  Description describe(Description description) => description.add("FormatException");
-  bool matches(item, Map matchState) => item is FormatException;  
+  Description describe(Description description) =>
+      description.add("FormatException");
+  bool matches(item, Map matchState) => item is FormatException;
 }
 
 void main() {
   test('Should throw exception when file is missing', () {
-    expect((){
-      new OptionsFile('bob');
-    }, throwsA(new FileIOExceptionMatcher()));
+    expect(() {
+      OptionsFile('bob');
+    }, throwsA(FileIOExceptionMatcher()));
   });
 
   test('Should not throw exception when file is present', () {
-    new OptionsFile('pubspec.yaml');
+    OptionsFile('pubspec.yaml');
   });
-  
+
   test('Should read string value', () {
-    var options = new OptionsFile('test/options');
-    var name = options.getString("name");
+    final options = OptionsFile('test/options');
+    final name = options.getString("name");
     expect("James", name);
   });
 
   test('Should ignore space around keys', () {
-    var options = new OptionsFile('test/options');
+    final options = OptionsFile('test/options');
     var name = options.getString("name1");
     expect("James", name);
 
     name = options.getString("name2");
     expect("James", name);
   });
-  
+
   test('Should ignore space around values', () {
-    var options = new OptionsFile('test/options');
-    var name = options.getString("name3");
+    final options = OptionsFile('test/options');
+    final name = options.getString("name3");
     expect("James", name);
   });
-  
+
   test('Should read int value', () {
-    var options = new OptionsFile('test/options');
-    var age = options.getInt("age");
+    final options = OptionsFile('test/options');
+    final age = options.getInt("age");
     expect(90, age);
   });
-  
+
   test('Should throw format exception when reading bad int', () {
-    var options = new OptionsFile('test/options');
-    expect((){
-      var age = options.getInt("name");
-    }, throwsA(new FormatExceptionMatcher()));
+    final options = OptionsFile('test/options');
+    expect(() {
+      final age = options.getInt("name");
+    }, throwsA(FormatExceptionMatcher()));
   });
 
   test('Should ignore comment lines', () {
-    var options = new OptionsFile('test/options');
-    var thing = options.getInt("thing");
+    final options = OptionsFile('test/options');
+    final thing = options.getInt("thing");
     expect(null, thing);
   });
-  
+
   test('Should use default string value when option is missing', () {
-    var options = new OptionsFile('test/options');
-    var wibble = options.getString("wibble", "default");
+    final options = OptionsFile('test/options');
+    final wibble = options.getString("wibble", "default");
     expect("default", wibble);
   });
-  
+
   test('Should use default int value when option is missing', () {
-    var options = new OptionsFile('test/options');
-    var wibble = options.getInt("wibble", 123);
+    final options = OptionsFile('test/options');
+    final wibble = options.getInt("wibble", 123);
     expect(123, wibble);
   });
-  
-  test('Should use default string value from default file when option is missing', () {
-    var options = new OptionsFile('test/options', 'test/defaultoptions');
-    var wibble = options.getString("thing");
+
+  test(
+      'Should use default string value from default file when option is missing',
+      () {
+    final options = OptionsFile('test/options', 'test/defaultoptions');
+    final wibble = options.getString("thing");
     expect("default", wibble);
   });
-  
-  test('Should use default int value from default file when option is missing', () {
-    var options = new OptionsFile('test/options', 'test/defaultoptions');
-    var wibble = options.getInt("number");
+
+  test('Should use default int value from default file when option is missing',
+      () {
+    final options = OptionsFile('test/options', 'test/defaultoptions');
+    final wibble = options.getInt("number");
     expect(12, wibble);
   });
-  
-  test('Should use default string value when option is missing in both files', () {
-    var options = new OptionsFile('test/options', 'test/defaultoptions');
-    var wibble = options.getString("thing2", "xyz");
+
+  test('Should use default string value when option is missing in both files',
+      () {
+    final options = OptionsFile('test/options', 'test/defaultoptions');
+    final wibble = options.getString("thing2", "xyz");
     expect("xyz", wibble);
   });
-  
+
   test('Should use default int value when option is missing in both files', () {
-    var options = new OptionsFile('test/options', 'test/defaultoptions');
-    var wibble = options.getInt("number2", 123);
+    final options = OptionsFile('test/options', 'test/defaultoptions');
+    final wibble = options.getInt("number2", 123);
     expect(123, wibble);
   });
 }
